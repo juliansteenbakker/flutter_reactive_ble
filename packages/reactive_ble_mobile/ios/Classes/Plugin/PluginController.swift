@@ -1,6 +1,6 @@
 import class CoreBluetooth.CBUUID
 import class CoreBluetooth.CBService
-import enum CoreBluetooth.CBManagerState
+import enum CoreBluetooth.CBCentralManagerState
 import var CoreBluetooth.CBAdvertisementDataServiceDataKey
 import var CoreBluetooth.CBAdvertisementDataServiceUUIDsKey
 import var CoreBluetooth.CBAdvertisementDataManufacturerDataKey
@@ -17,7 +17,7 @@ final class PluginController {
     var stateSink: EventSink? {
         didSet {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
-                self?.reportState()
+                    self?.reportState()
             }
         }
     }
@@ -32,7 +32,7 @@ final class PluginController {
 
         central = Central(
             onStateChange: papply(weak: self) { context, _, state in
-                context.reportState(state)
+                    context.reportState(CBCentralManagerState(rawValue: state.rawValue)!)
             },
             onDiscovery: papply(weak: self) { context, _, peripheral, advertisementData, rssi in
                 guard let sink = context.scan?.sink
@@ -505,7 +505,7 @@ final class PluginController {
         completion(.success(result))
     }
 
-    private func reportState(_ knownState: CBManagerState? = nil) {
+    private func reportState(_ knownState: CBCentralManagerState? = nil) {
         guard let sink = stateSink
         else { return }
 
